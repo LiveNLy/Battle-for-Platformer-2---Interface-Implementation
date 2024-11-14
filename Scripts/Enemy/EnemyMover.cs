@@ -8,11 +8,12 @@ public class EnemyMover : MonoBehaviour
     [SerializeField] private float _speed;
     [SerializeField] private FieldOfView _fieldOfView;
 
+    private static float _timeForCoroutine = 0.001f;
     private Fliper _fliper;
     private int _numberOfMovePoint = 0;
     private bool _flipped = true;
     private Coroutine _patroling;
-    private float _timeForCoroutine = 0.001f;
+    private WaitForSeconds _time = new WaitForSeconds(_timeForCoroutine);
 
     private void Awake()
     {
@@ -38,11 +39,19 @@ public class EnemyMover : MonoBehaviour
         _fieldOfView.CharacterLost -= StartCoroutinePatroling;
     }
 
+    public void StopMoveCoroutine()
+    {
+        StopAllCoroutines();
+
+
+    }
+
     public void StartCoroutinePatroling()
     {
         if (_patroling != null)
             StopCoroutine(_patroling);
 
+        if (gameObject.activeInHierarchy)
         _patroling = StartCoroutine(Patroling());
     }
 
@@ -56,20 +65,16 @@ public class EnemyMover : MonoBehaviour
 
     private IEnumerator FollowTheCharacter(Vector2 characterPosition)
     {
-        var time = new WaitForSeconds(_timeForCoroutine);
-
         while (enabled)
         {
             transform.position = Vector2.MoveTowards(transform.position, characterPosition, _speed * Time.deltaTime);
 
-            yield return time;
+            yield return _time;
         }
     }
 
     private IEnumerator Patroling()
     {
-        var time = new WaitForSeconds(_timeForCoroutine);
-
         while (enabled)
         {
             transform.position = Vector2.MoveTowards(transform.position, _movePoints[_numberOfMovePoint].position, _speed * Time.deltaTime);
@@ -77,13 +82,13 @@ public class EnemyMover : MonoBehaviour
             if (transform.position == _movePoints[_numberOfMovePoint].position)
                 _numberOfMovePoint = (++_numberOfMovePoint) % _movePoints.Length;
 
-            yield return time;
+            yield return _time;
         }
     }
 
     private void Flip()
     {
-        if (_numberOfMovePoint == 0 && !_flipped || _numberOfMovePoint == 1 && _flipped)
+        if (_numberOfMovePoint == 0 && _flipped == false || _numberOfMovePoint == 1 && _flipped)
         {
             _fliper.Flip();
             _flipped = !_flipped;

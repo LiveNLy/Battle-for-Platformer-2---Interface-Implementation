@@ -4,7 +4,7 @@ using UnityEngine;
 public class Health : MonoBehaviour
 {
     [SerializeField] protected float MaxHealthValue = 150;
-    [SerializeField] protected float _healthValue = 150;
+    [SerializeField] protected float HealthValue = 150;
 
     public event Action<float, float> SendInfo;
     public event Action LostHealth;
@@ -16,10 +16,10 @@ public class Health : MonoBehaviour
 
     public void LoseHealth(float damage)
     {
-        if (_healthValue > 0 && damage > 0)
-            _healthValue -= Mathf.Clamp(damage, 0, _healthValue);
+        if (HealthValue > 0 && damage > 0)
+            HealthValue -= Mathf.Clamp(damage, 0, HealthValue);
 
-        if (_healthValue <= 0)
+        if (HealthValue <= 0)
             HealthLost();
 
         SendHealthInfo();
@@ -27,8 +27,8 @@ public class Health : MonoBehaviour
 
     public void Heal(float heal)
     {
-        if (_healthValue < MaxHealthValue && heal > 0)
-            _healthValue += Mathf.Clamp(heal, 0, MaxHealthValue - _healthValue);
+        if (HealthValue < MaxHealthValue && heal > 0)
+            HealthValue += Mathf.Clamp(heal, 0, MaxHealthValue - HealthValue);
 
         SendHealthInfo();
     }
@@ -42,6 +42,6 @@ public class Health : MonoBehaviour
 
     private void SendHealthInfo()
     {
-        SendInfo?.Invoke(_healthValue, MaxHealthValue);
+        SendInfo?.Invoke(HealthValue, MaxHealthValue);
     }
 }

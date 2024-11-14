@@ -1,15 +1,12 @@
 using System;
 using UnityEngine;
 
-public class Coin : MonoBehaviour
+public class Coin : PickableItem
 {
     public event Action<Coin> CoinReleasing;
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected override void ActionAfterHit()
     {
-        if (collision.gameObject.TryGetComponent(out Character character) || collision.gameObject.TryGetComponent(out EnemyHitbox enemyHitbox))
-        {
-            CoinReleasing?.Invoke(this);
-        }
+        CoinReleasing?.Invoke(this);
     }
 }

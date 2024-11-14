@@ -4,6 +4,7 @@ public class EnemyReseter : MonoBehaviour
 {
     [SerializeField] private EnemyHealth _enemyHealth;
     [SerializeField] private SmoothSlider _healthSlider;
+    [SerializeField] private EnemyMover _enemyMover;
 
     private void OnEnable()
     {
@@ -17,6 +18,8 @@ public class EnemyReseter : MonoBehaviour
 
     private void ResetCharacter()
     {
+        _enemyMover.StopMoveCoroutine();
+       
         gameObject.SetActive(false);
         _healthSlider.gameObject.SetActive(false);
     }

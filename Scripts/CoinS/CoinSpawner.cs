@@ -5,6 +5,7 @@ using UnityEngine.Pool;
 public class CoinSpawner : MonoBehaviour
 {
     [SerializeField] private Coin _coinPrefab;
+    [SerializeField] private CollisionHandler _collisionHandler;
     [SerializeField] private CoinSpawner _spawnPosition;
     [SerializeField] private float _repeatRate = 0.5f;
     [SerializeField] private int _poolDefaultCapacity = 5;
@@ -26,7 +27,7 @@ public class CoinSpawner : MonoBehaviour
 
     private void OnEnable()
     {
-        _coinPrefab.CoinReleasing += ReleaseCoin;
+        _collisionHandler.CoinReleasing += ReleaseCoin;
     }
 
     private void Start()
@@ -36,7 +37,7 @@ public class CoinSpawner : MonoBehaviour
 
     private void OnDisable()
     {
-        _coinPrefab.CoinReleasing -= ReleaseCoin;
+        _collisionHandler.CoinReleasing -= ReleaseCoin;
     }
 
     private void ReleaseCoin(Coin coin)

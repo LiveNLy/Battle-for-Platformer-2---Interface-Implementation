@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Fliper), typeof(Rigidbody2D), typeof(InputReader))]
 public class PlayerMovement : MonoBehaviour
 {
     private const string Horizontal = nameof(Horizontal);
@@ -7,36 +8,31 @@ public class PlayerMovement : MonoBehaviour
     private const string Jumping = nameof(Jumping);
 
     [SerializeField] private float _moveSpeed;
-    [SerializeField] private bool _canJump = true;
+    [SerializeField] private bool _canJump;
     [SerializeField] private float _jumpPower;
 
-    private Animator _animator;
     private Fliper _fliper;
     private Rigidbody2D _rigidbody;
-    private float _direction = 0f;
+    private InputReader _inputReader;
     private bool _flipped = true;
     private bool _isJump;
 
     private void Awake()
     {
-        _animator = GetComponent<Animator>();
         _fliper = GetComponent<Fliper>();
         _rigidbody = GetComponent<Rigidbody2D>();
+        _inputReader = GetComponent<InputReader>();
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        Move();
-        Jump();
+        _inputReader.Jumped += JumpAction;
+        _inputReader.Runned += Moving;
     }
 
     private void FixedUpdate()
     {
-        float distance = _direction * _moveSpeed * Time.deltaTime;
-
-        transform.Translate(distance * Vector2.right);
-
-        if (_isJump)
+        if (_isJump && _canJump)
         {
             _rigidbody.velocity = _jumpPower * Vector2.up;
             _canJump = false;
@@ -44,32 +40,30 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void Jump()
+    private void OnDisable()
     {
-        if (Input.GetKeyDown(KeyCode.W) && _canJump)
-        {
-            _animator.SetTrigger(Jumping);
-            _isJump = true;
-        }
+        _inputReader.Jumped -= JumpAction;
+        _inputReader.Runned -= Moving;
     }
 
-    private void Move()
+    private void JumpAction()
     {
-        _direction = Input.GetAxis(Horizontal);
-        float distance = _direction * _moveSpeed * Time.deltaTime;
+        if (_canJump)
+            _isJump = true;
+    }
+
+    private void Moving(float direction)
+    {
+        float distance = direction * _moveSpeed * Time.deltaTime;
 
         transform.Translate(distance * Vector2.right);
 
-        _animator.SetBool(Running, IsCharacterMoving());
-
-        if (_direction > 0 && !_flipped || _direction < 0 && _flipped)
+        if (direction > 0 && !_flipped || direction < 0 && _flipped)
         {
             _fliper.Flip();
             _flipped = !_flipped;
         }
     }
-
-    private bool IsCharacterMoving() => Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D);
 
     private void OnCollisionEnter2D(Collision2D collision)
     {

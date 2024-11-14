@@ -8,11 +8,12 @@ public class SmoothSlider : NormalSlider
     [SerializeField, Range(0, 1)] private float _sliderSpeed = 0.3f;
 
     private Coroutine _coroutine;
-    private WaitForEndOfFrame wait = new WaitForEndOfFrame();
+    private WaitForEndOfFrame _wait = new WaitForEndOfFrame();
 
     private void OnDisable()
     {
-        StopCoroutine(_coroutine);
+        if (_coroutine != null)
+            StopCoroutine(_coroutine);
     }
 
     protected override void ShowHealth(float healthCount, float maxHealthValue)
@@ -20,7 +21,8 @@ public class SmoothSlider : NormalSlider
         if (_coroutine != null)
             StopCoroutine(_coroutine);
 
-        _coroutine = StartCoroutine(SmoothHealthChanging(healthCount, maxHealthValue));
+        if (gameObject.activeInHierarchy)
+            _coroutine = StartCoroutine(SmoothHealthChanging(healthCount, maxHealthValue));
     }
 
     private IEnumerator SmoothHealthChanging(float healthCount, float maxHealthValue)
@@ -31,7 +33,7 @@ public class SmoothSlider : NormalSlider
         {
             _slider.value = Mathf.MoveTowards(_slider.value, healthCount, _sliderSpeed);
 
-            yield return wait;
+            yield return _wait;
         }
     }
 }
